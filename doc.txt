@@ -1,0 +1,4 @@
+Laravel 12
+angular 19
+MySQL
+docker
