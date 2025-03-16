@@ -29,8 +29,8 @@ Ce projet est une application full-stack développée avec **Laravel 12** pour l
 
 ### 2️ Cloner le projet
 ```sh
-git clone https://github.com/TON-UTILISATEUR/TON-REPO.git
-cd TON-REPO
+git clone https://github.com/ousmane22/recrutement.git
+cd 
 ```
 
 ### 3️ Démarrer le backend avec Docker
@@ -40,14 +40,14 @@ docker-compose up -d --build
 
 ### 4️ Lancer le frontend Angular
 ```sh
-cd frontend
+cd auth.front
 npm install
 npm start
 ```
 
 ---
 
-## 🔐 Configuration Laravel
+## Configuration Laravel
 Créer un fichier `.env` à la racine du projet et configurer :
 ```env
 DB_CONNECTION=mysql
@@ -73,15 +73,14 @@ php artisan migrate --seed
 
 ---
 
-## 📌 Liens utiles
-- 🛠 **Trello** : [Lien Trello](https://trello.com/b/TON_LIEN_TRELLO)
-- 🔗 **Dépôt GitHub** : [Lien GitHub](https://github.com/TON-UTILISATEUR/TON-REPO)
-- 🌍 **Déploiement Backend** : [API en ligne](https://api.ton-site.com)
-- 🎨 **Déploiement Frontend** : [Application Web](https://www.ton-site.com)
-- 📌 **Collection Postman** : [Télécharger la collection](https://www.postman.com/collections/TON_LIEN_POSTMAN)
+## Liens utiles
+- **Trello** : [Lien Trello](https://trello.com/invite/b/67d6066e732401bbbb71e2e4/ATTI22326a4c0a6ca2f603faf37d19577657BCCD9682/entretien)
+- **Déploiement Backend** : [API en ligne]()
+- **Déploiement Frontend** : [Application Web]()
+- **Collection Postman** : [Télécharger la collection](https://gold-astronaut-737234.postman.co/workspace/New-Team-Workspace~a9bc200b-d744-4224-a71e-adcb4806d419/collection/37269911-b15dfc4e-0ebe-4c53-a22d-eeafbf101cd6/overview?action=share&creator=37269911)
 
 ---
 
-## 📞 Support
-Si vous avez des questions, ouvrez une issue sur [GitHub](https://github.com/TON-UTILISATEUR/TON-REPO/issues).
+## Support
+Si vous avez des questions, +221 77 775 01 77 ou ousmanend2211@gmail.com
 
