@@ -75,39 +75,45 @@ class AuthService
 
     public function forgotPassword(string $email)
     {
-        Mail::to($email)->send(new ResetPasswordMail());
-        // if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        //     return response()->json([
-        //         'message' => 'The provided email is invalid.',
-        //         'status' => HttpStatus::BAD_REQUEST,
-        //         'data' => null
-        //     ], HttpStatus::BAD_REQUEST);
-        // }
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            return response()->json([
+                'message' => 'The provided email is invalid.',
+                'status' => HttpStatus::BAD_REQUEST,
+                'data' => null
+            ], HttpStatus::BAD_REQUEST);
+        }
 
-        // try {
-        //     $status = Password::sendResetLink(['email' => $email]);
+        try {
+            $user = User::where('email', $email)->first();
 
-        //     if ($status == Password::RESET_LINK_SENT) {
-        //         return response()->json([
-        //             'message' => 'A password reset link has been sent to your email address.',
-        //             'status' => HttpStatus::SUCCESS,
-        //             'data' => null
-        //         ], HttpStatus::SUCCESS);
-        //     }
+            if ($user) {
+                $token = Password::createToken($user);
+                $url = 'http://localhost:4200/reset-password?token=' . $token . '&email=' . urlencode($email);
 
-        //     return response()->json([
-        //         'message' => 'Failed to send the reset link. Please check the email address.',
-        //         'status' => HttpStatus::BAD_REQUEST,
-        //         'data' => null
-        //     ], HttpStatus::BAD_REQUEST);
-        // } catch (\Exception $e) {
-        //     return response()->json([
-        //         'message' => 'An error occurred while sending the reset link.',
-        //         'status' => HttpStatus::INTERNAL_SERVER_ERROR,
-        //         'data' => $e->getMessage()
-        //     ], HttpStatus::INTERNAL_SERVER_ERROR);
-        // }
+                Mail::to($email)->send(new ResetPasswordMail($user->name, $url));
+
+                return response()->json([
+                    'message' => 'A password reset link has been sent to your email address.',
+                    'status' => HttpStatus::SUCCESS,
+                    'data' => null
+                ], HttpStatus::SUCCESS);
+            }
+
+            return response()->json([
+                'message' => 'Failed to generate the reset link. Please check the email address.',
+                'status' => HttpStatus::BAD_REQUEST,
+                'data' => null
+            ], HttpStatus::BAD_REQUEST);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'An error occurred while sending the reset link.',
+                'status' => HttpStatus::INTERNAL_SERVER_ERROR,
+                'data' => $e->getMessage()
+            ], HttpStatus::INTERNAL_SERVER_ERROR);
+        }
     }
+
+
 
     public function resetPassword(array $data)
     {

@@ -2,3 +2,6 @@ Laravel 12
 angular 19
 MySQL
 docker
+gmail for mail
+santum pour la securite
+api doc postman

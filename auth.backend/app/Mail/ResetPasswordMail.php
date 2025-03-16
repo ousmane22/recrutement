@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
@@ -13,12 +12,16 @@ class ResetPasswordMail extends Mailable
 {
     use Queueable, SerializesModels;
 
+    public $userName;
+    public $resetUrl;
+
     /**
      * Create a new message instance.
      */
-    public function __construct()
+    public function __construct($userName, $resetUrl)
     {
-        //
+        $this->userName = $userName;
+        $this->resetUrl = $resetUrl;
     }
 
     /**
