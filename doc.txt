@@ -5,3 +5,5 @@ docker
 gmail for mail
 santum pour la securite
 api doc postman
+git GitHub
+gestion des langues

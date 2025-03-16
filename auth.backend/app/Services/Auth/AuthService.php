@@ -2,175 +2,171 @@
 
 namespace App\Services\Auth;
 
-use App\Mail\ResetPasswordMail;
 use App\Models\User;
+use App\Services\Email\EmailService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Password;
-use Illuminate\Validation\ValidationException;
 use App\Constants\HttpStatus;
+use App\Exceptions\AuthException;
+use App\Exceptions\ValidationException as CustomValidationException;
+use App\Helpers\ApiResponse;
 
 class AuthService
 {
+    protected $validationService;
+    protected $emailService;
+    protected $processForgotPassword;
+    protected $processPasswordReset;
+
+    public function __construct(
+        ValidationService $validationService, 
+        EmailService $emailService,
+        ProcessForgotPassword $processForgotPassword,
+        ProcessPasswordReset $processPasswordReset
+    )
+    {
+        $this->validationService = $validationService;
+        $this->emailService = $emailService;
+        $this->processForgotPassword = $processForgotPassword;
+        $this->processPasswordReset = $processPasswordReset;
+    }
+
     public function login(array $credentials)
     {
-        if (Auth::attempt($credentials)) {
-            $user = Auth::user();
-            $token = $user->createToken('entretien', ['*'], now()->addHours(2))->plainTextToken;
+        try {
+            if (Auth::attempt($credentials)) {
+                $user = Auth::user();
+                $token = $this->generateToken($user);
 
-            return response()->json([
-                'message' => 'User logged in successfully',
-                'status' => HttpStatus::SUCCESS,
-                'data' => [
-                    'token' => $token,
-                    'user' => $user
-                ]
-            ], HttpStatus::SUCCESS);
+                return $this->sendLoginResponse($user, $token);
+            }
+
+            throw new AuthException("Identifiants invalides.", HttpStatus::BAD_REQUEST);
+        } catch (AuthException $e) {
+            return ApiResponse::sendResponse(
+                $e->getMessage(),
+                $e->getCode()
+            );
         }
-
-        return response()->json([
-            'message' => 'Invalid credentials.',
-            'status' => HttpStatus::BAD_REQUEST,
-            'data' => null
-        ], HttpStatus::BAD_REQUEST);
     }
 
     public function register(array $data)
     {
         try {
-            $validator = \Validator::make($data, [
-                'name' => 'required|string|max:255',
-                'email' => 'required|email|unique:users,email',
-                'password' => 'required|string|min:8|confirmed',
-            ]);
+            $validation = $this->validateRegistration($data);
 
-            if ($validator->fails()) {
-                return response()->json([
-                    'message' => 'Validation failed.',
-                    'status' => HttpStatus::BAD_REQUEST,
-                    'data' => $validator->errors()
-                ], HttpStatus::BAD_REQUEST);
+            if ($validation->fails()) {
+                throw new CustomValidationException('Échec de la validation.', HttpStatus::BAD_REQUEST);
             }
 
+            return $this->createUser($data);
+        } catch (CustomValidationException $e) {
+            return ApiResponse::sendResponse(
+                $e->getMessage(),
+                $e->getCode()
+            );
+        } catch (\Exception $e) {
+            return ApiResponse::sendResponse(
+                'Une erreur est survenue lors de l\'inscription.',
+                HttpStatus::INTERNAL_SERVER_ERROR,
+                $e->getMessage()
+            );
+        }
+    }
+
+    public function logout($user)
+    {
+        try {
+            $this->deleteUserTokens($user);
+            return $this->sendLogoutResponse();
+        } catch (\Exception $e) {
+            return ApiResponse::sendResponse(
+                'Une erreur est survenue lors de la déconnexion.',
+                HttpStatus::INTERNAL_SERVER_ERROR,
+                $e->getMessage()
+            );
+        }
+    }
+
+    protected function attemptLogin(array $credentials)
+    {
+        return Auth::attempt($credentials);
+    }
+
+    protected function generateToken($user)
+    {
+        return $user->createToken('entretien', ['*'], now()->addHours(2))->plainTextToken;
+    }
+
+    protected function sendLoginResponse($user, $token)
+    {
+        return ApiResponse::sendResponse(
+            'Utilisateur connecté avec succès',
+            HttpStatus::SUCCESS,
+            ['token' => $token, 'user' => $user]
+        );
+    }
+
+    protected function sendInvalidCredentialsResponse()
+    {
+        throw new AuthException('Identifiants invalides.', HttpStatus::BAD_REQUEST);
+    }
+
+    protected function validateRegistration(array $data)
+    {
+        return $this->validationService->validateRegistration($data);
+    }
+
+    protected function createUser(array $data)
+    {
+        try {
             $user = User::create([
                 'name' => $data['name'],
                 'email' => $data['email'],
                 'password' => Hash::make($data['password']),
             ]);
 
-            return response()->json([
-                'message' => 'User registered successfully',
-                'status' => HttpStatus::SUCCESS,
-                'data' => $user
-            ], HttpStatus::SUCCESS);
+            return ApiResponse::sendResponse(
+                'Utilisateur inscrit avec succès',
+                HttpStatus::SUCCESS,
+                $user
+            );
         } catch (\Exception $e) {
-            return response()->json([
-                'message' => 'An error occurred during registration.',
-                'status' => HttpStatus::INTERNAL_SERVER_ERROR,
-                'data' => $e->getMessage()
-            ], HttpStatus::INTERNAL_SERVER_ERROR);
+            throw new \Exception('Une erreur est survenue lors de l\'inscription.');
         }
+    }
+
+    protected function isValidEmail($email)
+    {
+        return filter_var($email, FILTER_VALIDATE_EMAIL);
+    }
+
+    protected function validateResetPassword(array $data)
+    {
+        return $this->validationService->validateResetPassword($data);
+    }
+
+    protected function deleteUserTokens($user)
+    {
+        $user->tokens()->delete();
+    }
+
+    protected function sendLogoutResponse()
+    {
+        return ApiResponse::sendResponse(
+            'Déconnexion réussie',
+            HttpStatus::SUCCESS
+        );
     }
 
     public function forgotPassword(string $email)
     {
-        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            return response()->json([
-                'message' => 'The provided email is invalid.',
-                'status' => HttpStatus::BAD_REQUEST,
-                'data' => null
-            ], HttpStatus::BAD_REQUEST);
-        }
-
-        try {
-            $user = User::where('email', $email)->first();
-
-            if ($user) {
-                $token = Password::createToken($user);
-                $url = 'http://localhost:4200/reset-password?token=' . $token . '&email=' . urlencode($email);
-
-                Mail::to($email)->send(new ResetPasswordMail($user->name, $url));
-
-                return response()->json([
-                    'message' => 'A password reset link has been sent to your email address.',
-                    'status' => HttpStatus::SUCCESS,
-                    'data' => null
-                ], HttpStatus::SUCCESS);
-            }
-
-            return response()->json([
-                'message' => 'Failed to generate the reset link. Please check the email address.',
-                'status' => HttpStatus::BAD_REQUEST,
-                'data' => null
-            ], HttpStatus::BAD_REQUEST);
-        } catch (\Exception $e) {
-            return response()->json([
-                'message' => 'An error occurred while sending the reset link.',
-                'status' => HttpStatus::INTERNAL_SERVER_ERROR,
-                'data' => $e->getMessage()
-            ], HttpStatus::INTERNAL_SERVER_ERROR);
-        }
+        return $this->processForgotPassword->handle($email);
     }
-
-
 
     public function resetPassword(array $data)
     {
-        $validated = \Validator::make($data, [
-            'email' => 'required|email',
-            'token' => 'required',
-            'password' => 'required|confirmed|min:8',
-        ]);
-
-        if ($validated->fails()) {
-            throw new ValidationException($validated);
-        }
-
-        $status = Password::reset(
-            $data,
-            function (User $user, string $password) {
-                $user->forceFill([
-                    'password' => Hash::make($password),
-                ])->save();
-
-                $user->tokens()->delete();
-
-                $token = $user->createToken('password-reset')->plainTextToken;
-
-                return response()->json([
-                    'message' => 'Your password has been successfully reset.',
-                    'status' => HttpStatus::SUCCESS,
-                    'data' => [
-                        'token' => $token,
-                        'user' => $user
-                    ]
-                ], HttpStatus::SUCCESS);
-            }
-        );
-
-        if ($status == Password::PASSWORD_RESET) {
-            return response()->json([
-                'message' => 'Your password has been successfully reset.',
-                'status' => HttpStatus::SUCCESS,
-                'data' => null
-            ], HttpStatus::SUCCESS);
-        }
-
-        return response()->json([
-            'message' => 'The reset link is invalid or has expired.',
-            'status' => HttpStatus::BAD_REQUEST,
-            'data' => null
-        ], HttpStatus::BAD_REQUEST);
-    }
-
-    public function logout($user)
-    {
-        $user->tokens()->delete();
-        return response()->json([
-            'message' => 'Logged out successfully',
-            'status' => HttpStatus::SUCCESS,
-            'data' => null
-        ], HttpStatus::SUCCESS);
+        return $this->processPasswordReset->handle($data);
     }
 }
