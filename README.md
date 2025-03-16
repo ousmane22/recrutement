@@ -74,6 +74,7 @@ php artisan migrate --seed
 ---
 
 ## Liens utiles
+- **Canva** : [Application Web](https://www.canva.com/design/DAGh77zN8RU/ThoVGniDa8GN6Zi9QNAOBA/edit?utm_content=DAGh77zN8RU&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton)
 - **Trello** : [Lien Trello](https://trello.com/invite/b/67d6066e732401bbbb71e2e4/ATTI22326a4c0a6ca2f603faf37d19577657BCCD9682/entretien)
 - **Déploiement Backend** : [API en ligne]()
 - **Déploiement Frontend** : [Application Web]()
