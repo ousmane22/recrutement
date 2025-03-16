@@ -1,0 +1,67 @@
+services:
+  app:
+    build:  ./auth.backend
+    container_name: entretien_app
+    image: entretien-api
+    ports:
+      - "8088:80" 
+    volumes:
+      - .:/var/www/html  
+    environment:
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_DATABASE=entretien
+      - DB_USERNAME=root
+      - DB_PASSWORD=root
+    networks:
+      - entretien_network
+    depends_on:
+      - db
+
+  db:
+    image: mysql:8.0
+    container_name: mysql_db
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: entretien
+      MYSQL_PASSWORD: entretien@123
+    volumes:
+      - mysql_data:/var/lib/mysql  
+    networks:
+      - entretien_network
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin
+    environment:
+      PMA_HOST: db
+      PMA_PORT: 3306
+    ports:
+      - "8089:80"
+    networks:
+      - entretien_network
+    depends_on:
+      - db
+  
+  frontend:
+    build: ./auth.front
+    container_name: auth.front
+    image: auth.front
+    ports:
+      - "4400:80"
+    volumes:
+      - ./auth.front:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+    networks:
+      - entretien_network
+    depends_on:
+      - app
+
+networks:
+  entretien_network:
+    driver: bridge
+
+volumes:
+  mysql_data:

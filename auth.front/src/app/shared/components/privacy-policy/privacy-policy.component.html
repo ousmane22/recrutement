@@ -1,0 +1,16 @@
+<div class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-2xl p-8 max-w-lg w-full mx-4 shadow-2xl transition-transform transform duration-300 scale-95 hover:scale-100">
+        <div class="flex justify-between items-center mb-6">
+            <button (click)="onClose.emit()"
+                class="text-gray-600 hover:text-gray-800 p-2 hover:bg-gray-200 rounded-full transition-all duration-300">
+                <lucide-icon [img]="CloseIcon" />
+            </button>
+        </div>
+        <h1 class="text-xl font-semibold text-gray-800 mb-4">Politique de confidentialité</h1>
+        <div class="bg-gray-50 p-6 rounded-xl text-lg leading-relaxed">
+            <div class="mb-4">
+              Lorem ipsum dolor sit amet consectetur, adipisicing elit. Libero officia excepturi consequatur ab obcaecati quibusdam molestiae assumenda iusto non! Asperiores accusamus ex est commodi inventore perspiciatis alias nulla adipisci illum.
+            </div>
+        </div>
+    </div>
+</div>

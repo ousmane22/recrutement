@@ -1,0 +1,31 @@
+<div class="min-h-screen bg-gradient-to-b from-blue-50 to-white">
+    <div class="container mx-auto px-4 py-16">
+        <div class="max-w-4xl mx-auto text-center">
+            <div class="mb-8 flex justify-center">
+                <lucide-icon [img]="DropletsIcon" class="h-20 w-20 text-blue-600" />
+            </div>
+
+            <h1 class="text-5xl font-bold text-gray-900 mb-6">
+                Bienvenue sur Application
+            </h1>
+
+            <p class="text-xl text-gray-600 mb-12 leading-relaxed">
+                Découvrez une nouvelle façon de gérer votre consommation d'eau.
+                Simple, efficace et écologique.
+            </p>
+
+            <div class="flex flex-col items-center gap-6">
+                <Button class="text-lg px-8 py-4 max-w-xs">
+                    Commencer
+                </Button>
+
+                <p (click)="toLoginPage()" class="text-gray-600">
+                    Déjà inscrit?
+                    <button class="text-blue-600 hover:text-blue-700 font-medium">
+                        Connexion
+                    </button>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
