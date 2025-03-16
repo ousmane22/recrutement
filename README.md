@@ -30,20 +30,15 @@ Ce projet est une application full-stack développée avec **Laravel 12** pour l
 ### 2️ Cloner le projet
 ```sh
 git clone https://github.com/ousmane22/recrutement.git
-cd 
 ```
 
-### 3️ Démarrer le backend avec Docker
+### 3️ Démarrer le projet avec Docker
 ```sh
 docker-compose up -d --build
 ```
 
-### 4️ Lancer le frontend Angular
-```sh
-cd auth.front
-npm install
-npm start
-```
+<img width="752" alt="image" src="https://github.com/user-attachments/assets/1c7dfb50-5ee7-4cc2-b288-d040a56a2ce3" />
+
 
 ---
 
