@@ -14,8 +14,9 @@ return new class extends Migration
         Schema::create('vols', function (Blueprint $table) {
             $table->id();
             $table->string('reference');
-            $table->foreignId('voyageur_id')->constrained('voyageurs'); 
-            $table->foreignId('compagnie_id')->constrained('compagnie_aeriennes');
+            $table->foreignId('voyageur_id')->constrained('voyageurs')->onDelete('cascade'); 
+            $table->unsignedBigInteger('compagnies_aeriennes_id');
+            $table->foreign('compagnies_aeriennes_id')->references('id')->on('compagnies_aeriennes')->onDelete('cascade');
             $table->dateTime('date_depart');
             $table->dateTime('date_arrivee');
             $table->string('aeroport_depart');
