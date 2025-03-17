@@ -53,6 +53,16 @@
             class="mt-1 block w-full rounded-md border-gray-300 border p-3 focus:border-blue-500 focus:ring-blue-500">
         </div>
 
+        <button type="button" (click)="sendVerificationCode()" [disabled]="registerForm.get('phone')?.invalid"
+          class="mt-2 px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed">
+          Envoyer un code de vérification
+        </button>
+
+        <div *ngIf="verificationSent">
+          <label for="verificationCode" class="block text-sm font-medium text-gray-700">Code de vérification</label>
+          <input id="verificationCode" formControlName="verificationCode" type="text" required
+            class="mt-1 block w-full rounded-md border-gray-300 border p-3 focus:border-blue-500 focus:ring-blue-500">
+        </div>
         <div>
           <label for="email" class="block text-sm font-medium text-gray-700">Adresse e-mail</label>
           <input id="email" formControlName="email" type="email" required
@@ -73,7 +83,7 @@
             passe</label>
           <input id="password_confirmation" formControlName="password_confirmation" type="password" required
             class="mt-1 block w-full rounded-md border-gray-300 border p-3 focus:border-blue-500 focus:ring-blue-500">
-            <div class="text-red-600 text-sm mt-1"
+          <div class="text-red-600 text-sm mt-1"
             *ngIf="registerForm.errors?.['passwordMismatch'] && registerForm.get('password_confirmation')?.touched">
             Les mots de passe ne correspondent pas.
           </div>

@@ -4,6 +4,7 @@ import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, Validatio
 import { Router } from '@angular/router';
 import { CountryService } from '../../shared/service/country.service';
 import { minimumAgeValidator } from '../../shared/validators/validators';
+import { AuthService } from '../service/auth-service.service';
 
 @Component({
   selector: 'app-register',
@@ -16,11 +17,14 @@ export class RegisterComponent {
   registerForm: FormGroup;
   countries: any[] = [];
   selectedCountry: any = null;
+  verificationSent = false;
+
 
   constructor(
     private fb: FormBuilder,
     private router: Router,
-    private countryService: CountryService
+    private countryService: CountryService,
+    private authService: AuthService
   ) {
     this.registerForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
@@ -31,6 +35,7 @@ export class RegisterComponent {
       dateOfBirth: ['', [Validators.required, minimumAgeValidator]],
       country: ['', Validators.required],
       phone: ['', Validators.required],
+      verificationCode: ['']
     }, { validator: this.passwordMatchValidator });
   }
 
@@ -60,7 +65,14 @@ export class RegisterComponent {
     if (this.step < 3) {
       this.step++;
     } else {
-      console.log(this.registerForm.value);
+      this.authService.register(this.registerForm.value).subscribe({
+        next: (response) => {
+          this.router.navigate(['/login']);
+        },
+        error: (error) => {
+          console.error('Erreur lors de l\'inscription:', error);
+        }
+      })
     }
   }
 
@@ -82,6 +94,19 @@ export class RegisterComponent {
   previousStep() {
     if (this.step > 1) {
       this.step--;
+    }
+  }
+
+  sendVerificationCode() {
+    const phoneNumber = this.registerForm.get('phone')?.value;
+    
+    if (phoneNumber) {
+      // this.smsService.sendSms(phoneNumber).subscribe(response => {
+      //   this.verificationSent = true;
+      //   alert('Code de vérification envoyé par SMS.');
+      // }, error => {
+      //   console.error("Erreur d'envoi du SMS", error);
+      // });
     }
   }
 }

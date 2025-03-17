@@ -20,12 +20,11 @@ class AuthService
     protected $processPasswordReset;
 
     public function __construct(
-        ValidationService $validationService, 
+        ValidationService $validationService,
         EmailService $emailService,
         ProcessForgotPassword $processForgotPassword,
         ProcessPasswordReset $processPasswordReset
-    )
-    {
+    ) {
         $this->validationService = $validationService;
         $this->emailService = $emailService;
         $this->processForgotPassword = $processForgotPassword;
@@ -122,7 +121,11 @@ class AuthService
     {
         try {
             $user = User::create([
-                'name' => $data['name'],
+                'firstName' => $data['firstName'],
+                'lastName' => $data['lastName'],
+                'dateOfBirth' => $data['dateOfBirth'],
+                'country' => $data['country'],
+                'phone' => $data['phone'],
                 'email' => $data['email'],
                 'password' => Hash::make($data['password']),
             ]);
@@ -136,7 +139,6 @@ class AuthService
             throw new \Exception('Une erreur est survenue lors de l\'inscription.');
         }
     }
-
     protected function isValidEmail($email)
     {
         return filter_var($email, FILTER_VALIDATE_EMAIL);
