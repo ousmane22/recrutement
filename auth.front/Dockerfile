@@ -1,19 +1,11 @@
 FROM node:lts-alpine AS build
 
-RUN node -v && npm -v
-
 WORKDIR /app
-
 COPY package*.json ./
-
-RUN npm install 
-
+RUN npm ci
 COPY . .
-
-RUN npm run build 
+RUN npm run build -- --configuration production
 
 FROM nginx:alpine
-
-COPY --from=build /app/dist/auth.front/browser /usr/share/nginx/html
-
+COPY --from=build /app/dist/entretien/browser /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/nginx.conf

@@ -1,8 +1,9 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { CountryService } from '../../shared/service/country.service';
+import { minimumAgeValidator } from '../../shared/validators/validators';
 
 @Component({
   selector: 'app-register',
@@ -19,18 +20,30 @@ export class RegisterComponent {
   constructor(
     private fb: FormBuilder,
     private router: Router,
-    private countryService: CountryService 
+    private countryService: CountryService
   ) {
     this.registerForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6)]],
+      password: ['', [Validators.required, Validators.minLength(8)]],
+      password_confirmation: ['', Validators.required],
       firstName: ['', Validators.required],
       lastName: ['', Validators.required],
-      dateOfBirth: ['', Validators.required],
+      dateOfBirth: ['', [Validators.required, minimumAgeValidator]],
       country: ['', Validators.required],
       phone: ['', Validators.required],
-    });
+    }, { validator: this.passwordMatchValidator });
   }
+
+  passwordMatchValidator(form: AbstractControl): ValidationErrors | null {
+    const password = form.get('password')?.value;
+    const confirmPassword = form.get('password_confirmation')?.value;
+
+    if (password !== confirmPassword) {
+      return { passwordMismatch: true };
+    }
+    return null;
+  }
+
 
   ngOnInit(): void {
     this.countryService.getCountries().subscribe({
@@ -48,7 +61,6 @@ export class RegisterComponent {
       this.step++;
     } else {
       console.log(this.registerForm.value);
-      this.router.navigate(['/login']);
     }
   }
 
@@ -66,5 +78,10 @@ export class RegisterComponent {
 
   get formControls() {
     return this.registerForm.controls;
+  }
+  previousStep() {
+    if (this.step > 1) {
+      this.step--;
+    }
   }
 }

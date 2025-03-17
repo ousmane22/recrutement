@@ -48,7 +48,7 @@ services:
     container_name: auth.front
     image: auth.front
     ports:
-      - "4400:80"
+      - "8090:80"
     volumes:
       - ./auth.front:/app
       - /app/node_modules
@@ -56,8 +56,7 @@ services:
       - NODE_ENV=development
     networks:
       - entretien_network
-    depends_on:
-      - app
+    
 
 networks:
   entretien_network:
