@@ -1,5 +1,5 @@
 services:
-  app:
+  app-entretien:
     build:  ./auth.backend
     container_name: entretien_app
     image: entretien-api
@@ -18,7 +18,7 @@ services:
     depends_on:
       - db
 
-  db:
+  db-entretien:
     image: mysql:8.0
     container_name: mysql_db
     environment:
@@ -30,7 +30,7 @@ services:
     networks:
       - entretien_network
 
-  phpmyadmin:
+  phpmyadmin-entretien:
     image: phpmyadmin/phpmyadmin
     container_name: phpmyadmin
     environment:
@@ -43,7 +43,7 @@ services:
     depends_on:
       - db
   
-  frontend:
+  frontend-entretien:
     build: ./auth.front
     container_name: auth.front
     image: auth.front
