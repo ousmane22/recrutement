@@ -8,12 +8,13 @@ import { AuthService } from '../service/auth-service.service';
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './forget-password.component.html',
-  styleUrls: ['./forget-password.component.css']  
+  styleUrls: ['./forget-password.component.css']
 })
 export class ForgetPasswordComponent {
   forgotPasswordForm: FormGroup;
   successMessage: string = '';
   errorMessage: string = '';
+  isLoading: boolean = false;
 
   constructor(private fb: FormBuilder, private authService: AuthService) {
     this.forgotPasswordForm = this.fb.group({
@@ -23,8 +24,10 @@ export class ForgetPasswordComponent {
 
   onSubmit() {
     if (this.forgotPasswordForm.valid) {
+      this.isLoading = true; 
       this.authService.forgotPassword(this.forgotPasswordForm.value.email).subscribe({
         next: (response) => {
+          this.isLoading = false;
           if (response.status === 200) {
             console.log(response);
             this.successMessage = response.message;
@@ -35,6 +38,7 @@ export class ForgetPasswordComponent {
           }
         },
         error: (error) => {
+          this.isLoading = false; 
           console.error(error);
           this.errorMessage = error.error.message;
           this.successMessage = '';

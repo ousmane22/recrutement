@@ -28,7 +28,7 @@ class ProcessForgotPassword
                 $frontendUrl = url('http://localhost:4200');  
                 $url = $frontendUrl . '/reset-password?token=' . $token . '&email=' . urlencode($email);
                 
-                $this->emailService->sendResetPasswordEmail($email, $user->name, $url);
+                $this->emailService->sendResetPasswordEmail($email, $user->firstName, $url);
 
                 return ApiResponse::sendResponse(
                     __('messages.password_reset_sent'),

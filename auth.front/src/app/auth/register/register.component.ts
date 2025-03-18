@@ -2,15 +2,16 @@ import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { CountryService } from '../../shared/service/country.service';
 import { minimumAgeValidator } from '../../shared/validators/validators';
 import { AuthService } from '../service/auth-service.service';
 import { Country } from '../model/country.model';
-import { Check, LucideAngularModule, Search } from 'lucide-angular';
+import { Check, CheckCheck, Eye, EyeOff, LucideAngularModule, Search } from 'lucide-angular';
+import { CountrySelectorComponent } from './components/country-selector/country-selector.component';
+import { StepIndicatorComponent } from './components/step-indicator/step-indicator.component';
 
 @Component({
   selector: 'app-register',
-  imports: [ReactiveFormsModule, CommonModule, FormsModule, LucideAngularModule],
+  imports: [ReactiveFormsModule, CommonModule, FormsModule, LucideAngularModule, CountrySelectorComponent, StepIndicatorComponent],
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.css']
 })
@@ -18,17 +19,17 @@ export class RegisterComponent {
   step = 1;
   registerForm: FormGroup;
   verificationSent = false;
-  isCountryModalOpen = false;
   selectedCountry: Country | null = null;
-  searchQuery = '';
-  countries: Country[] = [];
-  loading = true;
   otpValid: boolean = false;
   otpErrorMessage: string = '';
   otpSuccessIcon: boolean = false;
+  showPassword = false;
+  isSubmitting: boolean = false;
 
-  readonly search = Search;
-  readonly success = Check;
+
+  readonly success = CheckCheck;
+  readonly eyeoff = EyeOff;
+  readonly eye = Eye;
 
   constructor(
     private fb: FormBuilder,
@@ -58,71 +59,39 @@ export class RegisterComponent {
   }
 
   ngOnInit() {
-    this.fetchCountries();
     const defaultOtp = '1200';
     localStorage.setItem('otp', defaultOtp);
   }
 
   onSubmit() {
+
     if (this.step < 3) {
       this.step++;
     } else {
+      this.isSubmitting = true;
       if (this.verificationSent && this.registerForm.get('verificationCode')?.valid) {
         this.authService.register(this.registerForm.value).subscribe({
           next: (response) => {
+            this.isSubmitting = false;
+            alert('Inscription reussie');
             this.router.navigate(['/login']);
           },
           error: (error) => {
+            this.isSubmitting = false;
             console.error('Erreur lors de l\'inscription:', error);
           }
         });
       } else {
+        this.isSubmitting = false;
         alert('Veuillez entrer un code de vérification valide.');
       }
     }
-  }
-
-
-  fetchCountries() {
-    fetch('https://restcountries.com/v3.1/all')
-      .then((response) => response.json())
-      .then((data: Country[]) => {
-        this.countries = data.sort((a, b) => a.name.common.localeCompare(b.name.common));
-        this.loading = false;
-      })
-      .catch((error) => {
-        console.error('Error fetching countries:', error);
-        this.loading = false;
-      });
-  }
-
-  get formControls() {
-    return this.registerForm.controls;
   }
 
   previousStep() {
     if (this.step > 1) {
       this.step--;
     }
-  }
-
-  filteredCountries(): Country[] {
-    return this.countries.filter(country =>
-      country.name.common.toLowerCase().includes(this.searchQuery.toLowerCase())
-    );
-  }
-
-  getDialCode(country: Country): string {
-    if (country.idd.root && country.idd.suffixes && country.idd.suffixes.length > 0) {
-      return `${country.idd.root}${country.idd.suffixes[0]}`;
-    }
-    return '';
-  }
-
-  onSelectCountry(country: Country) {
-    this.selectedCountry = country;
-    this.isCountryModalOpen = false;
-    this.registerForm.get('country')?.setValue(country.name.common);
   }
 
   sendVerificationCode() {
@@ -135,13 +104,10 @@ export class RegisterComponent {
   }
 
   onOtpInputChange() {
-    const otpFromStorage = localStorage.getItem('otp'); 
-    const enteredOtp = this.registerForm.get('verificationCode')?.value; 
-    
-    console.log('OTP stocké:', otpFromStorage); 
-    console.log('OTP saisi:', enteredOtp);
-    
-    if (enteredOtp && otpFromStorage && otpFromStorage === enteredOtp.toString()) { 
+    const otpFromStorage = localStorage.getItem('otp');
+    const enteredOtp = this.registerForm.get('verificationCode')?.value;
+
+    if (enteredOtp && otpFromStorage && otpFromStorage === enteredOtp.toString()) {
       this.otpValid = true;
       this.otpErrorMessage = '';
       this.otpSuccessIcon = true;
@@ -150,5 +116,17 @@ export class RegisterComponent {
       this.otpErrorMessage = 'Code incorrect, veuillez réessayer.';
       this.otpSuccessIcon = false;
     }
+  }
+
+  onCountrySelected(country: Country) {
+    this.selectedCountry = country;
+    this.registerForm.get('country')?.setValue(country.name.common);
+  }
+
+  getDialCode(country: Country): string {
+    if (country.idd.root && country.idd.suffixes && country.idd.suffixes.length > 0) {
+      return `${country.idd.root}${country.idd.suffixes[0]}`;
+    }
+    return '';
   }
 }

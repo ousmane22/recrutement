@@ -18,6 +18,7 @@ export class ResetPasswordComponent implements OnInit {
   errorMessage: string = '';
   showPassword: boolean = false;
   showPasswordConfirmation: boolean = false;
+  isLoading: boolean = false;
 
   constructor(private route: ActivatedRoute, private authService: AuthService) {
     this.resetPasswordForm = new FormGroup({
@@ -49,25 +50,30 @@ export class ResetPasswordComponent implements OnInit {
       this.showPasswordConfirmation = !this.showPasswordConfirmation;
     }
   }
+
   onSubmit(): void {
     if (this.resetPasswordForm.valid) {
+      this.isLoading = true;
       const { email, token, password, password_confirmation } = this.resetPasswordForm.value;
-  
+
       if (password !== password_confirmation) {
         this.errorMessage = 'Les mots de passe ne correspondent pas.';
+        this.isLoading = false;
         return;
       }
-  
+
       this.authService.resetPassword(this.resetPasswordForm.value).subscribe({
         next: (response) => {
           this.successMessage = 'Mot de passe réinitialisé avec succès.';
           this.errorMessage = '';
+          this.isLoading = false;
         },
         error: (error) => {
           this.errorMessage = error.error?.message || 'Une erreur est survenue. Veuillez réessayer.';
-          this.successMessage = ''; 
+          this.successMessage = '';
+          this.isLoading = false;
         }
       });
     }
-  }  
+  }
 }

@@ -1,0 +1,17 @@
+{
+    "app": {
+      "login": {
+        "email": "Email Address",
+        "password": "Password",
+        "forgotPassword": "Forgot password?",
+        "loginButton": "Login",
+        "registerButton": "Register",
+        "privacyPolicy": "Privacy Policy",
+        "termsOfUse": "Terms of Use"
+      },
+      "error": {
+        "invalidCredentials": "Invalid credentials, please try again."
+      }
+    }
+  }
+  
