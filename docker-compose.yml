@@ -34,7 +34,7 @@ services:
     image: phpmyadmin/phpmyadmin
     container_name: phpmyadmin_entretien
     environment:
-      PMA_HOST: db
+      PMA_HOST: db-entretien
       PMA_PORT: 3306
     ports:
       - "8089:80"
