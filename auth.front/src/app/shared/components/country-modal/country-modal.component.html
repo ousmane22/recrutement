@@ -1,0 +1,11 @@
+<div class="modal">
+    <div class="modal-content">
+      <input type="text" [(ngModel)]="searchQuery" placeholder="Search for a country" />
+      <ul>
+        <li *ngFor="let country of filteredCountries()" (click)="onSelectCountry(country)">
+          {{ country.name.common }}
+        </li>
+      </ul>
+    </div>
+  </div>
+  

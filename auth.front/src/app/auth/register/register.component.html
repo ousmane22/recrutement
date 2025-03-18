@@ -13,7 +13,7 @@
         <div>
           <label for="firstName" class="block text-sm font-medium text-gray-700">Prénom</label>
           <input id="firstName" formControlName="firstName" type="text" required
-            class="mt-1 block w-full rounded-md border-gray-300 border p-3 focus:border-blue-500 focus:ring-blue-500">
+            class="mt-1 block w-full rounded-md border-gray-300 border p-2 focus:border-blue-500 focus:ring-blue-500">
           <div class="text-red-600 text-sm mt-1"
             *ngIf="registerForm.get('firstName')?.invalid && registerForm.get('firstName')?.touched">
             <span *ngIf="registerForm.get('firstName')?.errors?.['required']">Le prénom est requis.</span>
@@ -38,19 +38,31 @@
       <ng-container *ngIf="step === 2">
         <div>
           <label for="country" class="block text-sm font-medium text-gray-700">Pays / Région</label>
-          <select id="country" formControlName="country" (change)="onCountryChange($event)" required
-            class="mt-1 block w-full rounded-md border-gray-300 border p-3 focus:border-blue-500 focus:ring-blue-500">
-            <option value="">Sélectionnez un pays</option>
-            <option *ngFor="let country of countries" [value]="country.code">
-              <img [src]="country.flag" class="w-5 h-3.5 inline-block mr-2" />
-              {{ country.name }} ({{ country.dialCode }})
-            </option>
-          </select>
+          <button type="button" (click)="isCountryModalOpen = true"
+            class="w-full px-3 py-2 text-left border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+            <ng-container *ngIf="selectedCountry; else defaultCountry">
+              <div class="flex items-center gap-2">
+                <img [src]="selectedCountry.flags.svg" alt="Flag" class="w-5 h-4 object-cover" />
+                <span>{{ selectedCountry.name.common }}</span>
+              </div>
+            </ng-container>
+            <ng-template #defaultCountry>Votre Pays/Région</ng-template>
+          </button>
         </div>
-        <div>
-          <label for="phone" class="block text-sm font-medium text-gray-700">Numéro de téléphone</label>
-          <input id="phone" formControlName="phone" type="tel" required
-            class="mt-1 block w-full rounded-md border-gray-300 border p-3 focus:border-blue-500 focus:ring-blue-500">
+
+        <input type="hidden" formControlName="country" [value]="selectedCountry?.name?.common" />
+
+        <div class="space-y-2">
+          <label class="block text-sm font-medium text-gray-700">Numéro de téléphone</label>
+          <div class="flex">
+            <span
+              class="inline-flex items-center px-3 py-2 border border-r-0 border-gray-300 rounded-l-md bg-gray-50 text-gray-500 text-sm">
+              {{ selectedCountry ? getDialCode(selectedCountry) : '+' }}
+            </span>
+            <input type="tel" formControlName="phone"
+              class="flex-1 px-3 py-2 border border-l-0 border-gray-300 rounded-r-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              placeholder="Votre numéro de téléphone" />
+          </div>
         </div>
 
         <button type="button" (click)="sendVerificationCode()" [disabled]="registerForm.get('phone')?.invalid"
@@ -58,10 +70,20 @@
           Envoyer un code de vérification
         </button>
 
+
         <div *ngIf="verificationSent">
           <label for="verificationCode" class="block text-sm font-medium text-gray-700">Code de vérification</label>
-          <input id="verificationCode" formControlName="verificationCode" type="text" required
+          <input id="verificationCode" formControlName="verificationCode" type="number" required
+            (input)="onOtpInputChange()"
             class="mt-1 block w-full rounded-md border-gray-300 border p-3 focus:border-blue-500 focus:ring-blue-500">
+
+          <div *ngIf="!otpValid" class="text-red-600 text-sm mt-1">
+            {{ otpErrorMessage }}
+          </div>
+
+          <div *ngIf="otpSuccessIcon" class="text-green-600 text-sm mt-1">
+            <lucide-icon [img]="success" class="w-5 h-5 text-green-500"></lucide-icon> Code vérifié avec succès.
+          </div>
         </div>
         <div>
           <label for="email" class="block text-sm font-medium text-gray-700">Adresse e-mail</label>
@@ -90,16 +112,18 @@
         </div>
       </ng-container>
 
-      <div class="flex justify-between">
+      <div class="cursor-pointer flex justify-between">
         <button type="button" (click)="previousStep()" [disabled]="step === 1" class="px-4 py-2 border border-gray-300 rounded-md bg-gray-200 text-gray-700 
                        hover:bg-gray-300 disabled:bg-gray-100 disabled:cursor-not-allowed">
           Précédent
         </button>
 
-        <button type="submit" [disabled]="step === 3 && registerForm.invalid" [ngClass]="{
+        <button type="submit" [disabled]="step === 3 && registerForm.invalid"
+        [disabled]="step === 2 && !otpValid"
+         [ngClass]="{
                   'bg-gray-400 cursor-not-allowed': step === 3 && registerForm.invalid,
                   'bg-blue-600 hover:bg-blue-700 focus:ring-blue-500': !(step === 3 && registerForm.invalid)
-                }" class="px-4 py-2 rounded-md text-white">
+                }" class="px-4 py-2 rounded-md text-white cursor-pointer ">
           {{ step === 3 ? "Terminer l'inscription" : "Continuer" }}
         </button>
       </div>
@@ -108,5 +132,36 @@
     <p class="mt-4 text-center text-sm text-gray-600">
       Déjà inscrit? <a href="/login" class="text-blue-600 hover:text-blue-700">Connexion</a>
     </p>
+  </div>
+  <div *ngIf="isCountryModalOpen"
+    class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center p-4 z-50">
+    <div class="bg-white w-full max-w-md rounded-xl max-h-[100vh] overflow-hidden">
+      <div class="p-4 border-b border-gray-200">
+        <div class="flex items-center gap-2 px-3 py-2 bg-gray-100 rounded-lg">
+          <lucide-icon [img]="search" class="w-5 h-5 text-gray-500"></lucide-icon>
+          <input type="text" placeholder="Rechercher" class="bg-transparent w-full focus:outline-none"
+            [(ngModel)]="searchQuery" />
+        </div>
+      </div>
+
+      <div class="overflow-y-auto max-h-[60vh]">
+        <div *ngIf="loading" class="p-4 text-center text-gray-500">Chargement...</div>
+        <div *ngFor="let country of filteredCountries()">
+          <button (click)="onSelectCountry(country)"
+            class="w-full px-6 py-3 text-left hover:bg-gray-50 flex items-center gap-3">
+            <img [src]="country.flags.svg" alt="Flag" class="w-6 h-4 object-cover" />
+            <span>{{ country.name.common }}</span>
+            <span class="ml-auto text-gray-400">{{ getDialCode(country) }}</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="p-4 border-t border-gray-200">
+        <button (click)="isCountryModalOpen = false"
+          class="w-full py-2 px-4 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors">
+          Fermer
+        </button>
+      </div>
+    </div>
   </div>
 </div>
