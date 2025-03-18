@@ -16,7 +16,7 @@ services:
     networks:
       - entretien_network
     depends_on:
-      - db
+      - db-entretien
 
   db-entretien:
     image: mysql:8.0
@@ -41,7 +41,7 @@ services:
     networks:
       - entretien_network
     depends_on:
-      - db
+      - db-entretien
   
   frontend-entretien:
     build: ./auth.front
