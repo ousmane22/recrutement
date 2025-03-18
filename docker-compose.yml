@@ -6,7 +6,7 @@ services:
     ports:
       - "8088:80" 
     volumes:
-      - .:/var/www/html  
+      - ./auth.backend:/var/www/html  
     environment:
       - DB_HOST=db
       - DB_PORT=3306
