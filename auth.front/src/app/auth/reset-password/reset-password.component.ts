@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../service/auth-service.service';
 
 @Component({
@@ -14,14 +14,26 @@ export class ResetPasswordComponent implements OnInit {
   token: string | null = null;
   email: string | null = null;
   resetPasswordForm: FormGroup;
-  successMessage: string = '';
-  errorMessage: string = '';
-  showPassword: boolean = false;
-  showPasswordConfirmation: boolean = false;
-  isLoading: boolean = false;
+  successMessage = '';
+  errorMessage = '';
+  showPassword = false;
+  showPasswordConfirmation = false;
+  isLoading = false;
 
-  constructor(private route: ActivatedRoute, private authService: AuthService) {
-    this.resetPasswordForm = new FormGroup({
+  constructor(
+    private route: ActivatedRoute,
+    private authService: AuthService,
+    private router: Router
+  ) {
+    this.resetPasswordForm = this.createResetPasswordForm();
+  }
+
+  ngOnInit(): void {
+    this.setFormValuesFromQueryParams();
+  }
+
+  private createResetPasswordForm(): FormGroup {
+    return new FormGroup({
       password: new FormControl('', [Validators.required, Validators.minLength(8)]),
       password_confirmation: new FormControl('', [Validators.required, Validators.minLength(8)]),
       token: new FormControl(''),
@@ -29,10 +41,10 @@ export class ResetPasswordComponent implements OnInit {
     });
   }
 
-  ngOnInit(): void {
+  private setFormValuesFromQueryParams(): void {
     this.route.queryParams.subscribe(params => {
-      this.token = params['token'];
-      this.email = params['email'];
+      this.token = params['token'] || null;
+      this.email = params['email'] || null;
 
       if (this.token) {
         this.resetPasswordForm.patchValue({ token: this.token });
@@ -46,34 +58,40 @@ export class ResetPasswordComponent implements OnInit {
   togglePasswordVisibility(field: 'password' | 'password_confirmation'): void {
     if (field === 'password') {
       this.showPassword = !this.showPassword;
-    } else if (field === 'password_confirmation') {
+    } else {
       this.showPasswordConfirmation = !this.showPasswordConfirmation;
     }
   }
 
   onSubmit(): void {
-    if (this.resetPasswordForm.valid) {
-      this.isLoading = true;
-      const { email, token, password, password_confirmation } = this.resetPasswordForm.value;
+    if (this.resetPasswordForm.invalid) return;
 
-      if (password !== password_confirmation) {
-        this.errorMessage = 'Les mots de passe ne correspondent pas.';
-        this.isLoading = false;
-        return;
-      }
+    this.isLoading = true;
+    const { password, password_confirmation } = this.resetPasswordForm.value;
 
-      this.authService.resetPassword(this.resetPasswordForm.value).subscribe({
-        next: (response) => {
-          this.successMessage = 'Mot de passe réinitialisé avec succès.';
-          this.errorMessage = '';
-          this.isLoading = false;
-        },
-        error: (error) => {
-          this.errorMessage = error.error?.message || 'Une erreur est survenue. Veuillez réessayer.';
-          this.successMessage = '';
-          this.isLoading = false;
-        }
-      });
+    if (password !== password_confirmation) {
+      this.errorMessage = 'Les mots de passe ne correspondent pas.';
+      this.isLoading = false;
+      return;
     }
+
+    this.authService.resetPassword(this.resetPasswordForm.value).subscribe({
+      next: () => this.handleResetSuccess(),
+      error: (error) => this.handleResetError(error),
+    });
+  }
+
+  private handleResetSuccess(): void {
+    this.successMessage = 'Mot de passe réinitialisé avec succès.';
+    this.errorMessage = '';
+    this.isLoading = false;
+    alert('Votre mot de passe a été réinitialisé avec succès ! Vous allez être redirigé vers la page de connexion.');
+    this.router.navigate(['/login']);
+  }
+
+  private handleResetError(error: any): void {
+    this.errorMessage = error.error?.message || 'Une erreur est survenue. Veuillez réessayer.';
+    this.successMessage = '';
+    this.isLoading = false;
   }
 }

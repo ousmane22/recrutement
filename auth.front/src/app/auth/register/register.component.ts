@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 import { minimumAgeValidator } from '../../shared/validators/validators';
 import { AuthService } from '../service/auth-service.service';
 import { Country } from '../model/country.model';
-import { Check, CheckCheck, Eye, EyeOff, LucideAngularModule, Search } from 'lucide-angular';
+import { LucideAngularModule, CheckCheck, EyeOff, Eye } from 'lucide-angular';
 import { CountrySelectorComponent } from './components/country-selector/country-selector.component';
 import { StepIndicatorComponent } from './components/step-indicator/step-indicator.component';
 
@@ -20,12 +20,11 @@ export class RegisterComponent {
   registerForm: FormGroup;
   verificationSent = false;
   selectedCountry: Country | null = null;
-  otpValid: boolean = false;
-  otpErrorMessage: string = '';
-  otpSuccessIcon: boolean = false;
+  otpValid = false;
+  otpErrorMessage = '';
+  otpSuccessIcon = false;
   showPassword = false;
-  isSubmitting: boolean = false;
-
+  isSubmitting = false;
 
   readonly success = CheckCheck;
   readonly eyeoff = EyeOff;
@@ -49,55 +48,44 @@ export class RegisterComponent {
     }, { validator: this.passwordMatchValidator });
   }
 
+  ngOnInit() {
+    localStorage.setItem('otp', '1200');
+  }
+
   passwordMatchValidator(form: AbstractControl): ValidationErrors | null {
     const password = form.get('password')?.value;
     const confirmPassword = form.get('password_confirmation')?.value;
-    if (password !== confirmPassword) {
-      return { passwordMismatch: true };
-    }
-    return null;
-  }
-
-  ngOnInit() {
-    const defaultOtp = '1200';
-    localStorage.setItem('otp', defaultOtp);
+    return password !== confirmPassword ? { passwordMismatch: true } : null;
   }
 
   onSubmit() {
-
     if (this.step < 3) {
       this.step++;
-    } else {
+    } else if (this.verificationSent && this.registerForm.get('verificationCode')?.valid) {
       this.isSubmitting = true;
-      if (this.verificationSent && this.registerForm.get('verificationCode')?.valid) {
-        this.authService.register(this.registerForm.value).subscribe({
-          next: (response) => {
-            this.isSubmitting = false;
-            alert('Inscription reussie');
-            this.router.navigate(['/login']);
-          },
-          error: (error) => {
-            this.isSubmitting = false;
-            console.error('Erreur lors de l\'inscription:', error);
-          }
-        });
-      } else {
-        this.isSubmitting = false;
-        alert('Veuillez entrer un code de vérification valide.');
-      }
+      this.authService.register(this.registerForm.value).subscribe({
+        next: () => {
+          this.isSubmitting = false;
+          alert('Inscription réussie');
+          this.router.navigate(['/login']);
+        },
+        error: (error) => {
+          this.isSubmitting = false;
+          console.error('Erreur lors de l\'inscription:', error);
+        }
+      });
+    } else {
+      this.isSubmitting = false;
+      alert('Veuillez entrer un code de vérification valide.');
     }
   }
 
   previousStep() {
-    if (this.step > 1) {
-      this.step--;
-    }
+    if (this.step > 1) this.step--;
   }
 
   sendVerificationCode() {
-    const phoneNumber = this.registerForm.get('phone')?.value;
-
-    if (phoneNumber) {
+    if (this.registerForm.get('phone')?.value) {
       this.verificationSent = true;
       alert('Code de vérification envoyé par SMS.');
     }
@@ -107,7 +95,7 @@ export class RegisterComponent {
     const otpFromStorage = localStorage.getItem('otp');
     const enteredOtp = this.registerForm.get('verificationCode')?.value;
 
-    if (enteredOtp && otpFromStorage && otpFromStorage === enteredOtp.toString()) {
+    if (enteredOtp && otpFromStorage === enteredOtp.toString()) {
       this.otpValid = true;
       this.otpErrorMessage = '';
       this.otpSuccessIcon = true;
@@ -124,9 +112,6 @@ export class RegisterComponent {
   }
 
   getDialCode(country: Country): string {
-    if (country.idd.root && country.idd.suffixes && country.idd.suffixes.length > 0) {
-      return `${country.idd.root}${country.idd.suffixes[0]}`;
-    }
-    return '';
+    return country.idd.root && country.idd.suffixes?.length ? `${country.idd.root}${country.idd.suffixes[0]}` : '';
   }
 }
