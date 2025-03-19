@@ -30,19 +30,21 @@
       </ng-container>
 
       <ng-container *ngIf="step === 2">
-        <app-country-selector [selectedCountry]="selectedCountry" (countrySelected)="onCountrySelected($event)"></app-country-selector>
+        <app-country-selector [selectedCountry]="selectedCountry"
+          (countrySelected)="onCountrySelected($event)"></app-country-selector>
 
         <input type="hidden" formControlName="country" [value]="selectedCountry?.name?.common" />
 
         <div class="space-y-2">
           <label class="block text-sm font-medium text-gray-700">{{ 'registration.phone' | translate }}</label>
           <div class="flex">
-            <span class="inline-flex items-center px-3 py-2 border border-r-0 border-gray-300 rounded-l-md bg-gray-50 text-gray-500 text-sm">
+            <span
+              class="inline-flex items-center px-3 py-2 border border-r-0 border-gray-300 rounded-l-md bg-gray-50 text-gray-500 text-sm">
               {{ selectedCountry ? getDialCode(selectedCountry) : '+' }}
             </span>
             <input type="tel" formControlName="phone"
               class="flex-1 px-3 py-2 border border-l-0 border-gray-300 rounded-r-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              [placeholder]="'registration.phonePlaceholder' | translate" />
+              placeholder="{{ 'registration.phonePlaceholder' | translate }}" />
           </div>
         </div>
 
@@ -53,10 +55,16 @@
 
         <div *ngIf="verificationSent">
           <label for="verificationCode" class="block text-sm font-medium text-gray-700">{{ 'registration.verificationCode' | translate }}</label>
-          <input id="verificationCode" formControlName="verificationCode" type="number" required (input)="onOtpInputChange()"
+          <input id="verificationCode" formControlName="verificationCode" type="number" required
+            (input)="onOtpInputChange()"
             class="mt-1 block w-full rounded-md border-gray-300 border p-3 focus:border-blue-500 focus:ring-blue-500">
+
           <div *ngIf="!otpValid" class="text-red-600 text-sm mt-1">
-            {{ otpErrorMessage | translate }}
+            {{ otpErrorMessage }}
+          </div>
+
+          <div *ngIf="otpSuccessIcon" class="text-green-600 text-sm mt-1">
+            <lucide-icon [img]="success" class="w-5 h-5 text-green-500"></lucide-icon> Code verified successfully.
           </div>
         </div>
         <div>
@@ -72,6 +80,11 @@
           <div class="relative">
             <input id="password" formControlName="password" [type]="showPassword ? 'text' : 'password'" required
               class="mt-1 block w-full rounded-md border-gray-300 border p-3 focus:border-blue-500 focus:ring-blue-500">
+            <button type="button" (click)="showPassword = !showPassword"
+              class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500">
+              <lucide-icon [img]="eyeoff" *ngIf="!showPassword" class="w-5 h-5"></lucide-icon>
+              <lucide-icon [img]="eye" *ngIf="showPassword" class="w-5 h-5"></lucide-icon>
+            </button>
           </div>
         </div>
 
@@ -81,6 +94,11 @@
             <input id="password_confirmation" formControlName="password_confirmation"
               [type]="showPassword ? 'text' : 'password'" required
               class="mt-1 block w-full rounded-md border-gray-300 border p-3 focus:border-blue-500 focus:ring-blue-500">
+            <button type="button" (click)="showPassword = !showPassword"
+              class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500">
+              <lucide-icon [img]="eyeoff" *ngIf="!showPassword" class="w-5 h-5"></lucide-icon>
+              <lucide-icon [img]="eye" *ngIf="showPassword" class="w-5 h-5"></lucide-icon>
+            </button>
           </div>
           <div class="text-red-600 text-sm mt-1"
             *ngIf="registerForm.errors?.['passwordMismatch'] && registerForm.get('password_confirmation')?.touched">
@@ -90,7 +108,7 @@
       </ng-container>
 
       <div class="cursor-pointer flex justify-between">
-        <button type="button" (click)="previousStep()" [disabled]="step === 1" class="px-4 py-2 border border-gray-300 rounded-md bg-gray-200 
+        <button type="button" (click)="previousStep()" [disabled]="step === 1" class="px-4 py-2 border border-gray-300 rounded-md bg-gray-200 text-gray-700 
                        hover:bg-gray-300 disabled:bg-gray-100 disabled:cursor-not-allowed">
           {{ 'registration.previous' | translate }}
         </button>
@@ -99,15 +117,22 @@
           'bg-gray-400 cursor-not-allowed': step === 3 && registerForm.invalid || isSubmitting,
           'bg-blue-600 hover:bg-blue-700 focus:ring-blue-500': !(step === 3 && registerForm.invalid || isSubmitting)
         }" class="px-4 py-2 rounded-md text-white cursor-pointer">
-          <span *ngIf="isSubmitting">{{ 'registration.loading' | translate }}</span>
-          <span *ngIf="!isSubmitting">{{ step === 3 ? ('registration.complete' | translate) : ('registration.continue' | translate) }}</span>
+
+          <span *ngIf="isSubmitting">
+            {{ 'registration.loading' | translate }}
+          </span>
+
+          <span *ngIf="!isSubmitting">
+            {{ (step === 3 ? 'registration.complete' : 'registration.continue') | translate }}
+          </span>
+
         </button>
+
       </div>
     </form>
 
     <p class="mt-4 text-center text-sm text-gray-600">
-      {{ 'registration.alreadyRegistered' | translate }} 
-      <a href="/login" class="text-blue-600 hover:text-blue-700">{{ 'registration.login' | translate }}</a>
+      {{ 'registration.alreadyRegistered' | translate }} <a href="/login" class="text-blue-600 hover:text-blue-700">{{ 'registration.login' | translate }}</a>
     </p>
   </div>
 </div>
