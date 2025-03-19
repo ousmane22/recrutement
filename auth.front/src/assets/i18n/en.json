@@ -1,17 +1,65 @@
 {
-    "app": {
-      "login": {
-        "email": "Email Address",
-        "password": "Password",
-        "forgotPassword": "Forgot password?",
-        "loginButton": "Login",
-        "registerButton": "Register",
-        "privacyPolicy": "Privacy Policy",
-        "termsOfUse": "Terms of Use"
-      },
-      "error": {
-        "invalidCredentials": "Invalid credentials, please try again."
-      }
+  "forgotPassword": {
+    "title": "Forgot Password",
+    "description": "Enter your email to receive an email to reset your password.",
+    "email": "Email Address",
+    "emailPlaceholder": "Your email address",
+    "emailRequired": "Email is required.",
+    "invalidEmail": "Please enter a valid email address.",
+    "submitButton": "Receive Email"
+  },
+  "FORGOT_PASSWORD": "Forgot Password",
+  "NEW_PASSWORD": "New Password",
+  "CONFIRM_PASSWORD": "Confirm Your Password",
+  "PASSWORD_REQUIRED": "Password is required and must be at least 8 characters.",
+  "PASSWORD_CONFIRMATION_REQUIRED": "Password confirmation is required and must be at least 8 characters.",
+  "PASSWORDS_DO_NOT_MATCH": "Passwords do not match. Please try again.",
+  "I_AM_NOT_A_ROBOT": "I am not a robot",
+  "SAVE": "Save",
+  "registration": {
+    "title": "Sign Up",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "dateOfBirth": "Date of Birth",
+    "phone": "Phone Number",
+    "phonePlaceholder": "Your phone number",
+    "sendCode": "Send Verification Code",
+    "verificationCode": "Verification Code",
+    "email": "Email Address",
+    "password": "Password",
+    "confirmPassword": "Confirm Your Password",
+    "previous": "Previous",
+    "continue": "Continue",
+    "complete": "Complete Sign Up",
+    "loading": "Loading...",
+    "alreadyRegistered": "Already registered?",
+    "login": "Login",
+    "errors": {
+      "firstNameRequired": "First name is required.",
+      "dateOfBirthRequired": "Date of birth is required.",
+      "minimumAge": "You must be at least 18 years old.",
+      "passwordMismatch": "Passwords do not match."
+    }
+  },
+  "app": {
+    "login": {
+      "title": "Application",
+      "email": "Email Address",
+      "password": "Password",
+      "forgotPassword": "Forgot Password?",
+      "loginButton": "Login",
+      "registerButton": "Sign Up",
+      "privacyPolicy": "Privacy Policy",
+      "termsOfUse": "Terms of Use",
+      "loading": "Loading...",
+      "Hometitle": "Welcome to the Application",
+      "subtitle": "Discover a new way to manage your water consumption. Simple, effective, and eco-friendly.",
+      "begin": "Start",
+      "alreadyRegistered": "Already registered?",
+      "login": "Login"
+    },
+    "error": {
+      "invalidCredentials": "Invalid credentials, please try again."
     }
   }
-  
+}

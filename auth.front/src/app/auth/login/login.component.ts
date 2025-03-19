@@ -6,11 +6,12 @@ import { AuthService } from '../service/auth-service.service';
 import { LoginResponse } from '../model/login-response.model';
 import { CommonModule } from '@angular/common';
 import { PrivacyPolicyComponent } from '../../shared/components/privacy-policy/privacy-policy.component';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [LucideAngularModule, ReactiveFormsModule, FormsModule, CommonModule, PrivacyPolicyComponent],
+  imports: [LucideAngularModule, ReactiveFormsModule, FormsModule, CommonModule, PrivacyPolicyComponent,TranslateModule],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css']
 })

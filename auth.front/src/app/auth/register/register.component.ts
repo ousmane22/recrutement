@@ -8,10 +8,11 @@ import { Country } from '../model/country.model';
 import { LucideAngularModule, CheckCheck, EyeOff, Eye } from 'lucide-angular';
 import { CountrySelectorComponent } from './components/country-selector/country-selector.component';
 import { StepIndicatorComponent } from './components/step-indicator/step-indicator.component';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-register',
-  imports: [ReactiveFormsModule, CommonModule, FormsModule, LucideAngularModule, CountrySelectorComponent, StepIndicatorComponent],
+  imports: [ReactiveFormsModule, CommonModule, FormsModule, LucideAngularModule, CountrySelectorComponent, StepIndicatorComponent, TranslateModule],
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.css']
 })

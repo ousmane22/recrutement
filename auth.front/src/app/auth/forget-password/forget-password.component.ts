@@ -2,11 +2,12 @@ import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, FormControl, Validators, ReactiveFormsModule } from '@angular/forms';
 import { AuthService } from '../service/auth-service.service';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-forget-password',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, TranslateModule],
   templateUrl: './forget-password.component.html',
   styleUrls: ['./forget-password.component.css']
 })
@@ -24,7 +25,7 @@ export class ForgetPasswordComponent {
 
   onSubmit() {
     if (this.forgotPasswordForm.valid) {
-      this.isLoading = true; 
+      this.isLoading = true;
       this.authService.forgotPassword(this.forgotPasswordForm.value.email).subscribe({
         next: (response) => {
           this.isLoading = false;
@@ -38,7 +39,7 @@ export class ForgetPasswordComponent {
           }
         },
         error: (error) => {
-          this.isLoading = false; 
+          this.isLoading = false;
           console.error(error);
           this.errorMessage = error.error.message;
           this.successMessage = '';

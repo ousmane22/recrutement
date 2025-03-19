@@ -6,23 +6,22 @@
             </div>
 
             <h1 class="text-5xl font-bold text-gray-900 mb-6">
-                Bienvenue sur Application
+                {{ 'app.login.Hometitle' | translate }}
             </h1>
 
             <p class="text-xl text-gray-600 mb-12 leading-relaxed">
-                Découvrez une nouvelle façon de gérer votre consommation d'eau.
-                Simple, efficace et écologique.
+                {{ 'app.login.subtitle' | translate }}
             </p>
 
             <div class="flex flex-col items-center gap-6">
                 <Button class="text-lg px-8 py-4 max-w-xs">
-                    Commencer
+                    {{ 'app.login.registerButton' | translate }}
                 </Button>
 
                 <p (click)="toLoginPage()" class="text-gray-600">
-                    Déjà inscrit?
+                    {{ 'app.login.alreadyRegistered' | translate }}
                     <button class="cursor-pointer text-blue-600 hover:text-blue-700 font-medium">
-                        Connexion
+                        {{ 'app.login.login' | translate }}
                     </button>
                 </p>
             </div>

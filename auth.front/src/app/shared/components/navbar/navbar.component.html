@@ -1,0 +1,77 @@
+<nav class="bg-white shadow-lg">
+    <div class="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
+      <div class="flex justify-between h-16">
+        <div class="flex items-center">
+          <span class="text-xl font-semibold">Application</span>
+        </div>
+  
+        <div class="hidden sm:flex items-center space-x-4">
+          <button
+            (click)="toggleLanguage('en')"
+            class="flex items-center space-x-2 px-3 py-2 rounded-md"
+            [ngClass]="{ 'bg-gray-100': currentLang === 'en' }"
+          >
+            <img
+              src="https://flagcdn.com/w40/gb.png"
+              alt="British flag"
+              class="w-6 h-4 object-cover rounded-sm"
+            />
+            <span>English</span>
+          </button>
+          <button
+            (click)="toggleLanguage('fr')"
+            class="flex items-center space-x-2 px-3 py-2 rounded-md"
+            [ngClass]="{ 'bg-gray-100': currentLang === 'fr' }"
+          >
+            <img
+              src="https://flagcdn.com/w40/fr.png"
+              alt="French flag"
+              class="w-6 h-4 object-cover rounded-sm"
+            />
+            <span>Français</span>
+          </button>
+        </div>
+  
+        <div class="sm:hidden flex items-center">
+          <button
+            (click)="toggleMobileMenu()"
+            class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500"
+          >
+            <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  
+    <div *ngIf="isMobileMenuOpen" class="sm:hidden">
+      <div class="pt-2 pb-3 space-y-1">
+        <button
+          (click)="toggleLanguage('en')"
+          class="flex items-center space-x-2 w-full px-3 py-2"
+          [ngClass]="{ 'bg-gray-100': currentLang === 'en' }"
+        >
+          <img
+            src="https://flagcdn.com/w40/gb.png"
+            alt="British flag"
+            class="w-6 h-4 object-cover rounded-sm"
+          />
+          <span>English</span>
+        </button>
+        <button
+          (click)="toggleLanguage('fr')"
+          class="flex items-center space-x-2 w-full px-3 py-2"
+          [ngClass]="{ 'bg-gray-100': currentLang === 'fr' }"
+        >
+          <img
+            src="https://flagcdn.com/w40/fr.png"
+            alt="French flag"
+            class="w-6 h-4 object-cover rounded-sm"
+          />
+          <span>Français</span>
+        </button>
+      </div>
+    </div>
+  </nav>
+  
